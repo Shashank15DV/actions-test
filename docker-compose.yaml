@@ -1,0 +1,44 @@
+version: "3.8"
+
+services:
+  mongodb:
+    image: 'mongo'
+    container_name: mongodb
+    volumes:
+      - data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: shashank
+      MONGO_INITDB_ROOT_PASSWORD: password
+    
+    # importing env 
+    # env_file:
+    # - ./mongo.env
+    # docker compose by defualt it will create network so we don't have to create explicitly
+
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - '3001:3001'
+    volumes:
+      - logs:/app/logs
+      - ./backend:/app
+    env_file:
+      - ./env/backend.env
+    depends_on:
+      - mongodb
+
+  frontend:
+    build: ./frontend1
+    ports:
+      - '5173:5173'
+    volumes:
+      - ./frontend1/src:/app/src
+    stdin_open: true
+    tty: true
+
+# if we want named volume, we need to mention here...
+volumes:
+  data:
+  logs:
